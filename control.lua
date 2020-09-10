@@ -31,9 +31,11 @@ local function try_build_entity(entity, player)
 end
 
 local function get_build_area(player)
+    local x = player.position.x
+    local y = player.position.y
     return {
-        {player.position.x - radius, player.position.y - radius},
-        {player.position.x + radius, player.position.y + radius}
+        {x - radius, y - radius},
+        {x + radius, y + radius}
     }
 end
 
