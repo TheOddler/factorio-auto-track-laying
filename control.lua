@@ -6,7 +6,7 @@ local function can_build(item, player)
 end
 
 local function try_build_entity(entity, player)
-    if entity.type == "entity-ghost" then
+    if entity.valid and entity.type == "entity-ghost" then
         items = entity.ghost_prototype.items_to_place_this
 
         -- Check if this is an allowed item, and the player has all items, if not fail
