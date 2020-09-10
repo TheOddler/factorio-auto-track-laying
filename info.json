@@ -1,0 +1,13 @@
+{
+  "name": "auto-track-laying",
+  "version": "0.0.1",
+  "title": "Auto Track Laying",
+  "author": "The Oddler",
+  "contact": "pablo.bollansee@gmail.com",
+  "homepage": "",
+  "description": "Automatically lay track ghosts when walking over them.",
+  "factorio_version": "1.0",
+  "dependencies": [
+    "base >= 1.0"
+  ]
+}
