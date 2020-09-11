@@ -76,7 +76,8 @@ local function on_player_changed_position(event)
         position = position,
         radius = radius,
         ghost_name = allowed_ghost_names,
-        type = "entity-ghost"
+        type = "entity-ghost",
+        collision_mask = "ghost-layer"
     }
     
     -- Debug draw
