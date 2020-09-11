@@ -1,22 +1,18 @@
-local radius_player = 1.8
+local radius_player = 2
 local radius_vehicle = 3
+local allowed_ghost_names = {"straight-rail", "curved-rail", "rail-signal", "rail-chain-signal"}
 
 function sign(x)
     if (x < 0) then return -1 end
     return 1
 end
 
-local function can_build(item, player)
-    return string.find(item.name, "rail") -- Player can only build rail-related items
-       and player.get_item_count(item.name) >= item.count
-end
-
 local function try_revive_entity(entity, player)
     items = entity.ghost_prototype.items_to_place_this
 
-    -- Check if this is an allowed item, and the player has all items, if not fail
+    -- Check if the player has all items, if not fail
     for _, item in pairs(items) do
-        if (not can_build(item, player)) then
+        if (player.get_item_count(item.name) < item.count) then
             return false
         end
     end
@@ -79,6 +75,7 @@ local function on_player_changed_position(event)
     local entities = player.surface.find_entities_filtered{
         position = position,
         radius = radius,
+        ghost_name = allowed_ghost_names,
         type = "entity-ghost"
     }
     
