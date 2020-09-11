@@ -11,29 +11,27 @@ local function can_build(item, player)
        and player.get_item_count(item.name) >= item.count
 end
 
-local function try_build_entity(entity, player)
-    if entity.valid and entity.type == "entity-ghost" then
-        items = entity.ghost_prototype.items_to_place_this
+local function try_revive_entity(entity, player)
+    items = entity.ghost_prototype.items_to_place_this
 
-        -- Check if this is an allowed item, and the player has all items, if not fail
-        for _, item in pairs(items) do
-            if (not can_build(item, player)) then
-                return false
-            end
+    -- Check if this is an allowed item, and the player has all items, if not fail
+    for _, item in pairs(items) do
+        if (not can_build(item, player)) then
+            return false
         end
-
-        -- Try to revive
-        success = entity.revive()
-
-        if (success) then
-            -- Actually remove items from player inventory
-            for _, item in pairs(items) do
-                player.remove_item(item)
-            end
-        end
-
-        return success
     end
+
+    -- Try to revive
+    success = entity.revive()
+
+    if (success) then
+        -- Actually remove items from player inventory
+        for _, item in pairs(items) do
+            player.remove_item(item)
+        end
+    end
+
+    return success
 end
 
 local function calculate_length(bounding_box)
@@ -86,10 +84,16 @@ local function on_player_changed_position(event)
 
     if (not player.character) then return end
 
-    local entities = player.surface.find_entities(get_build_area(player))
+    local entities = player.surface.find_entities_filtered{
+        area = get_build_area(player),
+        -- position = …, radius = …,
+        type = "entity-ghost"
+    }
     
     for _, entity in pairs(entities) do
-        try_build_entity(entity, player)
+        if entity.valid then
+            try_revive_entity(entity, player)
+        end
     end
 end
 
