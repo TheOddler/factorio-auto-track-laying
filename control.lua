@@ -35,9 +35,15 @@ local function try_revive_entity(entity, player)
 end
 
 local function calculate_length(bounding_box)
-    local bb_lt = bounding_box.left_top
-    local bb_rb = bounding_box.right_bottom
-    return math.max(bb_rb.x - bb_lt.x, bb_rb.y - bb_lt.y)
+    return bounding_box.right_bottom.y - bounding_box.left_top.y
+end
+
+local function calculate_direction(entity)
+    local rad = entity.orientation * 2 * math.pi
+    return {
+        x = math.sin(rad),
+        y = -math.cos(rad)
+    }
 end
 
 local function get_build_area(player)
@@ -50,31 +56,19 @@ local function get_build_area(player)
 
     -- Then calculate some values
     local rad = entity.orientation * 2 * math.pi
-    local dir_x = math.sin(rad)
-    local dir_y = -math.cos(rad)
+    local dir = calculate_direction(entity)
     local length = calculate_length(entity.bounding_box)
     local radius = player.vehicle and radius_vehicle or radius_player -- kinda like ternary
 
     -- Offset the position
-    local x = x + dir_x * length * speed_sign
-    local y = y + dir_y * length * speed_sign
+    local x = x + dir.x * length * speed_sign
+    local y = y + dir.y * length * speed_sign
 
     -- Create an area around the position
     local area = {
         left_top = { x - radius, y - radius },
         right_bottom = { x + radius, y + radius }
     }
-    
-    -- Debug draw
-    -- rendering.draw_rectangle{
-    --     color = {r = 1},
-    --     width = 2,
-    --     filled = false,
-    --     left_top = area.left_top,
-    --     right_bottom = area.right_bottom,
-    --     surface = 1,
-    --     time_to_live = 2
-    -- }
 
     return area
 end
@@ -84,10 +78,22 @@ local function on_player_changed_position(event)
 
     if (not player.character) then return end
 
+    local area = get_build_area(player)
     local entities = player.surface.find_entities_filtered{
-        area = get_build_area(player),
+        area = area,
         -- position = …, radius = …,
         type = "entity-ghost"
+    }
+    
+    -- Debug draw
+    rendering.draw_rectangle{
+        color = {r = 1},
+        width = 2,
+        filled = false,
+        left_top = area.left_top,
+        right_bottom = area.right_bottom,
+        surface = 1,
+        time_to_live = 2
     }
     
     for _, entity in pairs(entities) do
