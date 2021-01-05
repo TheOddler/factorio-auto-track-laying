@@ -1,6 +1,6 @@
 local radius_player = 2
 local radius_vehicle = 3
-local ghost_name_must_include = "rail"
+local allowed_ghost_types = {"straight-rail", "curved-rail", "rail-signal", "rail-chain-signal"}
 
 function sign(x)
     if (x < 0) then return -1 end
@@ -75,6 +75,7 @@ local function on_player_changed_position(event)
     local entities = player.surface.find_entities_filtered{
         position = position,
         radius = radius,
+        ghost_type = allowed_ghost_types,
         type = "entity-ghost",
         collision_mask = "ghost-layer"
     }
@@ -91,8 +92,8 @@ local function on_player_changed_position(event)
     -- }
     
     for _, entity in pairs(entities) do
-        -- if entity.valid then
-        if entity.valid and string.find(entity.ghost_name, ghost_name_must_include) then
+        if entity.valid then
+            -- game.print(entity.ghost_type)
             try_revive_entity(entity, player)
         end
     end
