@@ -7,7 +7,7 @@ local common = {}
 
 -- This will activate heavy logging because the mod reacts each time the
 -- player position changes. Better set these to "false" before release!
-local SPAM_THE_LOGFILE = true
+local SPAM_THE_LOGFILE = false
 local SPAM_THE_GAMECHAT = false
 
 
