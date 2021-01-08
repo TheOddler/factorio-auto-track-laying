@@ -8,7 +8,6 @@
   "description": "Automatically lay tracks and other train-related ghosts when driving or walking over them.",
   "factorio_version": "1.1",
   "dependencies": [
-    "base >= 0.18",
-    "(?) Bio_Industries"
+    "base >= 0.18"
   ]
 }
