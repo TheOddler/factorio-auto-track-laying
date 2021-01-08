@@ -1,6 +1,6 @@
 local radius_player = 2
 local radius_vehicle = 3
-local allowed_ghost_types = {"straight-rail", "curved-rail", "rail-signal", "rail-chain-signal"}
+local allowed_ghost_types = {"straight-rail", "curved-rail", "rail-signal", "rail-chain-signal", "train-stop"}
 
 function sign(x)
     if (x < 0) then return -1 end
