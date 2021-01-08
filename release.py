@@ -21,7 +21,6 @@ excludes = [
     '.gitattributes',
     '*.zip',
     '*.py',
-    '*.txt',
     'inspect.lua',
 ]
 with ZipFile(f'{root_folder_name}.zip', 'w', ZIP_DEFLATED) as zipObj:
