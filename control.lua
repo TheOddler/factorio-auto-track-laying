@@ -47,6 +47,7 @@ local compatibility_types = {
 -- list will work like this:
 -- ({filter = rail} AND restrictions[1] … AND restrictions[n]) OR
 -- ({filter = "type", type = "rail-signal"} AND restrictions[1] … AND restrictions[n]) …
+-- So you'll probably want `mode = "and"` for every restriction.
 local restrictions = {{
     filter = "flag",
     flag = "not-blueprintable",
@@ -99,12 +100,10 @@ local function get_rail_prototype_filters()
                 filters[#filters + 1] = {
                     ["filter"] = filter_name, -- e.g. {filter = "type"}
                     [filter_name] = prototype -- e.g. {type = "rail-signal"}
-                    
                 }
                 add_restrictions()
             end
-            -- Otherwise, use just the filter
-        else
+        else -- Otherwise, use just the filter
             filters[#filters + 1] = {
                 ["filter"] = filter_name
             }
