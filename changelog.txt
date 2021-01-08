@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.0.1
+Date: 2020-09-11
+
+  Info:
+    - Initial version
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2020-11-26
+
+  Info:
+    - Update for Factorio 1.1.
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2020-08-26
+
+  Changes:
+    - Changes some code so that now all entities with "rail" in their name will be automatically placed. Hopefully this will be a good way to support all mods that add custom rails.
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2021-01-05
+
+  Changes:
+    - Entities are now filtered by type rather than using their name. This should be a much better way of selecting the correct entities.
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2021-01-05
+
+  Changes:
+    - Added trainstops to list of placeable ghosts
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2021-01-06
+
+  Info:
+    - Changes by Pi-C, reviewed and cleaned by The Oddler. Thanks to Pi-C for all his time and help!
+
+  Bugfixes:
+    - Raise event when a ghost is revived, so that other mods can react to the change.
+
+  Changes:
+    - If the player is on a train, set the position to the front locomotive/wagon in the direction the train is moving. This way, the train can still place rails even if the player is not in the front locomotive/wagon.
+    - If the player is in a vehicle (including a locomotive or a wagon that's part of a train), rails etc. will be taken from the player's inventory first. If the player doesn't have enough of a needed item, the vehicle he's riding in (or the complete train, if the vehicle is a locomotive/train wagon) will be checked. Items will be taken in this order: only from player, from player and vehicle/train, or only from vehicle/train.
+    - If rocks or trees are in the way when trying to place a ghost, they will be mined now. The mined items will be added to train cargo (wagons) first, then to vehicles (car trunk, or the fuel slots of a locomotive), then to the player. Any items that couldn't be inserted will be spilled on the ground.
+    - Added working changelog. :-)
+
+  Compatibility:
+    - Compile a list of the prototype names the mod should be able to place, and store it in the global table. The list will be rebuilt if on_configuration_changed triggers (new version of Factorio, mods added/removed/updated).
+    - Made it easy to add other prototypes needed by other mods.
+    - Added "Rail-to-power connector" from "Bio Industries" to list of replaceable ghosts.
+    - Added "Floating electric pole" from "Cargo Ships" to list of replaceable ghosts.
+
