@@ -60,3 +60,20 @@ Date: 2021-01-06
     - Added "Rail-to-power connector" from "Bio Industries" to list of replaceable ghosts.
     - Added "Floating electric pole" from "Cargo Ships" to list of replaceable ghosts.
 
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.5
+Date: 2021-01-14
+
+  Changes:
+    - Removed hidden dependency on BI
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.6
+Date: 2021-01-14
+
+  Changes:
+    - Fixed crash when removing multiple obstacles
+    - Fixed bug where obstacles at the far end of a curved rail would not be removed
+    - Increased search radius slightly

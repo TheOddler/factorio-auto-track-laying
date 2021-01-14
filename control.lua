@@ -11,8 +11,9 @@ if script.active_mods["gvv"] then
 end
 
 -- Set search radius for player and player in vehicle
-local radius_player = 2
-local radius_vehicle = 3
+local radius_player = 3
+local radius_vehicle = 4
+local radius_obstacle_removal = 4
 
 -- These are the obviously rail-related prototypes that we always want! We need them
 -- to get a list of prototype names and for entity searches later on. It may seem
@@ -330,13 +331,12 @@ local function try_revive_entity(entity, player)
         -- Could not revive the ghost. Is there a rock or tree in the way?
     else
         ATL.f_log("Couldn't place \"%s\". Check what's in the way!", entity.ghost_name)
-        local obstacles = entity.surface.find_entities_filtered(
-                              {
-                position = entity.position,
-                radius = 2,
-                type = global.removable.filter.type,
-                name = global.removable.filter.name
-            })
+        local obstacles = entity.surface.find_entities_filtered({
+            position = entity.position,
+            radius = radius_obstacle_removal,
+            type = global.removable.filter.type,
+            name = global.removable.filter.name
+        })
         ATL.f_log("Found %s obstacles", #obstacles)
 
         -- We want to mine this. Make a temporary inventory to store the items,
@@ -407,8 +407,8 @@ local function try_revive_entity(entity, player)
                 end
             end
             ATL.f_log("Inventory size: %s, Mined: %s", #inventory, serpent.block(inventory.get_contents()))
-            inventory.destroy()
         end
+        inventory.destroy()
     end
 
     return success
@@ -479,16 +479,9 @@ local function on_player_changed_position(event)
     ATL.f_log("Looking for ghosts ahead of %s (%s)", entity.name, entity.unit_number)
 
     local radius = player.vehicle and radius_vehicle or radius_player -- kinda like ternary
-    
+
     local position = get_point_in_front_of(entity)
 
-    -- ~ local entities = player.surface.find_entities_filtered{
-    -- ~ position = position,
-    -- ~ radius = radius,
-    -- ~ ghost_type = allowed_ghost_types,
-    -- ~ type = "entity-ghost",
-    -- ~ collision_mask = "ghost-layer"
-    -- ~ }
     local entities = player.surface.find_entities_filtered {
         position = position,
         radius = radius,
