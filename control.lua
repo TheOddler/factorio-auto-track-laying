@@ -79,13 +79,6 @@ local function try_revive_entity(main_entity, player)
         has_tile_ghost = true,
         force = "player" -- only place stuff from the player
     }
-    rendering.draw_rectangle {
-        surface = surface,
-        color = { 1, 0.5, 0 },
-        left_top = main_entity.bounding_box.left_top,
-        right_bottom = main_entity.bounding_box.right_bottom,
-        time_to_live = 5,
-    }
     for _, tile in ipairs(tiles_to_place) do
         for _, ghost in ipairs(tile.get_tile_ghosts()) do
             table.insert(all_entities, ghost)
@@ -189,13 +182,13 @@ local function on_player_changed_position(event)
         to_be_deconstructed = false
     }
 
-    rendering.draw_circle {
-        surface = surface,
-        color = { 1, 0.5, 0 },
-        target = position,
-        radius = radius,
-        time_to_live = 5,
-    }
+    -- rendering.draw_circle {
+    --     surface = surface,
+    --     color = { 1, 0.5, 0 },
+    --     target = position,
+    --     radius = radius,
+    --     time_to_live = 5,
+    -- }
 
     for _, to_place in pairs(stuff_to_place) do
         try_revive_entity(to_place, player)
