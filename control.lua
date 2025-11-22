@@ -136,8 +136,9 @@ local function try_revive_entity(main_entity, player)
 
     -- Now do the actual reviving:
     for _, entity in ipairs(all_entities) do
-        -- Get the cost before placing, otherwise the entity might/will become invalid
+        -- Get the cost and type before placing, because after the entity will be invalid
         local cost = entity.ghost_prototype.items_to_place_this
+        local ghost_type = entity.ghost_type
 
         -- Do the actual reviving
         collisions, revived_entity, item_request_proxy = entity.revive {
@@ -146,7 +147,8 @@ local function try_revive_entity(main_entity, player)
         }
 
         -- If the reviving was successful, we'll actually take the items
-        if revived_entity then
+        -- Note that tiles don't have a revived_entity, so we just assume they places successfully
+        if (revived_entity or ghost_type == "tile") then
             for _, item in ipairs(cost) do
                 local still_to_remove = item.count
                 still_to_remove = still_to_remove - player.remove_item({
