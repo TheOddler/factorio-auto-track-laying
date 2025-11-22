@@ -25,20 +25,31 @@ end
 ---@param entity LuaEntity
 ---@return {x: number, y: number}
 local function get_point_in_front_of(entity)
-    -- Get some basic values first
-    local speed_sign = sign(entity.speed or entity.character_running_speed) -- moving forward or backwards?
-    local x = entity.position.x or entity.position[1]
-    local y = entity.position.y or entity.position[2]
+    local train = entity.train
+    if train then
+        local speed_sign = sign(train.speed)
+        local train_end = speed_sign > 0 and train.front_end or train.back_end
+        local pos = train_end.location.position
+        return {
+            x = pos.x,
+            y = pos.y
+        }
+    else
+        -- Get some basic values first
+        local speed_sign = sign(entity.speed or entity.character_running_speed) -- moving forward or backwards?
+        local x = entity.position.x or entity.position[1]
+        local y = entity.position.y or entity.position[2]
 
-    -- Then calculate some values
-    local dir = calculate_direction(entity)
-    local length = calculate_length(entity.bounding_box)
+        -- Then calculate some values
+        local dir = calculate_direction(entity)
+        local length = calculate_length(entity.bounding_box)
 
-    -- Return offset position
-    return {
-        x = x + dir.x * length * speed_sign,
-        y = y + dir.y * length * speed_sign
-    }
+        -- Return offset position
+        return {
+            x = x + dir.x * length * speed_sign,
+            y = y + dir.y * length * speed_sign
+        }
+    end
 end
 
 -- Build the list of placeable entity types
