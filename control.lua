@@ -19,6 +19,7 @@ local function sign(x)
     return (x < 0) and -1 or 1
 end
 
+---@param entity LuaEntity
 local function calculate_direction(entity)
     local rad = entity.orientation * 2 * math.pi
     return {
@@ -32,33 +33,30 @@ local function calculate_length(bounding_box)
 end
 
 ---@param entity LuaEntity
+---@param distance number
 ---@return {x: number, y: number}
-local function get_point_in_front_of(entity)
+local function get_point_in_front_of(entity, distance)
     local train = entity.train
     if train then
         local speed_sign = sign(train.speed)
-        local train_end = speed_sign > 0 and train.front_end or train.back_end
-        local pos = train_end.location.position
-        return {
-            x = pos.x,
-            y = pos.y
-        }
-    else
-        -- Get some basic values first
-        local speed_sign = sign(entity.speed or entity.character_running_speed) -- moving forward or backwards?
-        local x = entity.position.x or entity.position[1]
-        local y = entity.position.y or entity.position[2]
-
-        -- Then calculate some values
-        local dir = calculate_direction(entity)
-        local length = calculate_length(entity.bounding_box)
-
-        -- Return offset position
-        return {
-            x = x + dir.x * length * speed_sign,
-            y = y + dir.y * length * speed_sign
-        }
+        local train_stock = speed_sign > 0 and train.front_stock or train.back_stock
+        entity = train_stock or entity
     end
+
+    -- Get some basic values first
+    local speed_sign = sign(entity.speed or entity.character_running_speed) -- moving forward or backwards?
+    local x = entity.position.x or entity.position[1]
+    local y = entity.position.y or entity.position[2]
+
+    -- Then calculate some values
+    local dir = calculate_direction(entity)
+    local length = calculate_length(entity.bounding_box) + distance
+
+    -- Return offset position
+    return {
+        x = x + dir.x * length * speed_sign,
+        y = y + dir.y * length * speed_sign
+    }
 end
 
 -- Build the list of placeable entity types
@@ -88,16 +86,29 @@ local function make_placeable_types_list()
 end
 local placeable_types = make_placeable_types_list()
 
----@param main_entity LuaEntity
+local function make_elevated_rail_types_list()
+    local types = {}
+    for _, type in pairs(placeable_types) do
+        if string.find(type, "elevated") ~= nil then
+            table.insert(types, type)
+        end
+    end
+    return types
+end
+local elevated_rail_types = make_elevated_rail_types_list()
+
+---@param entity_to_revive LuaEntity
 ---@param player LuaPlayer
-local function try_revive_entity(main_entity, player)
-    local vehicle = player.vehicle and player.vehicle.train or player.vehicle
-    local surface = main_entity.surface
+local function try_revive_entity(entity_to_revive, player)
+    local train = player.vehicle and player.vehicle.train
+    local vehicle = train or player.vehicle
+    local surface = entity_to_revive.surface
 
     -- When placing one entity, we might want to place tiles under it too, so gather everything we need to place
     local all_entities = {}
+    -- Add tiles (landfill, but I guess mods could add other stuff too)
     local tiles_to_place = surface.find_tiles_filtered {
-        area = main_entity.bounding_box,
+        area = entity_to_revive.bounding_box,
         has_tile_ghost = true,
         force = "player" -- only place stuff from the player
     }
@@ -106,7 +117,22 @@ local function try_revive_entity(main_entity, player)
             table.insert(all_entities, ghost)
         end
     end
-    table.insert(all_entities, main_entity) -- Add it last so it gets places last, as the tiles will need to be placed before this can
+    -- Add rail supports
+    if (table_contains(elevated_rail_types, entity_to_revive.ghost_type)) then
+        local rail_supports = surface.find_entities_filtered {
+            position = entity_to_revive.position,
+            radius = 6,
+            ghost_type = "rail-support",
+            type = "entity-ghost",
+            to_be_deconstructed = false,
+            force = "player" -- only place stuff from the player
+        }
+        for _, rail_support in ipairs(rail_supports) do
+            table.insert(all_entities, rail_support)
+        end
+    end
+    -- Add the main entity last so it gets revived last, as it'll need the other found entities to be able to be revived
+    table.insert(all_entities, entity_to_revive)
 
     -- Calculate the whole cost
     local full_cost = {}
@@ -133,7 +159,7 @@ local function try_revive_entity(main_entity, player)
 
     -- Check if there's anything colliding with the entity, and if so remove it if we can
     local stuff_to_remove = surface.find_entities_filtered {
-        area = main_entity.bounding_box,
+        area = entity_to_revive.bounding_box,
         to_be_deconstructed = true,
         force = "neutral" -- only remove neutral stuff (like trees and rocks)
     }
@@ -192,16 +218,17 @@ local function on_player_changed_position(event)
     local entity = player.vehicle or player.character
     if (not entity) then return end
     local surface = entity.surface
-    local position = get_point_in_front_of(entity)
 
-    local radius = 10
+    local radius = player.vehicle and 6 or 4
+    local position = get_point_in_front_of(entity, radius / 3)
 
     local stuff_to_place = surface.find_entities_filtered {
         position = position,
         radius = radius,
         ghost_type = placeable_types,
         type = "entity-ghost",
-        to_be_deconstructed = false
+        to_be_deconstructed = false,
+        force = "player" -- only place stuff from the player
     }
 
     -- rendering.draw_circle {
