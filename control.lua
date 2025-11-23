@@ -3,6 +3,15 @@ local function debug_log(something)
     game.print(str)
 end
 
+local function table_contains(tbl, item)
+    for _, value in ipairs(tbl) do
+        if value == item then
+            return true
+        end
+    end
+    return false
+end
+
 local function sign(x)
     -- ~ if (x < 0) then return -1 end
     -- ~ return 1
@@ -71,7 +80,9 @@ local function make_placeable_types_list()
         { filter = "rail" }
     }
     for _, p in pairs(rail_prototypes) do
-        table.insert(types, p.type)
+        if not table_contains(types, p.type) then
+            table.insert(types, p.type)
+        end
     end
     return types
 end
