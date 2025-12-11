@@ -164,14 +164,20 @@ local function try_revive_entity(entity_to_revive, player)
         force = "neutral" -- only remove neutral stuff (like trees and rocks)
     }
     for _, to_remove in ipairs(stuff_to_remove) do
-        remove_success = to_remove.mine {
-            inventory =
-                player.character
-                and player.character.get_main_inventory(),
-            raise_destroyed = true,
-        }
-        if not remove_success then
-            return
+        -- When removing stuff, it can happen that a next entity we found gets removed or changed with it.
+        -- The time I found this happens is with cliffs, as they can change when they are destroyed.
+        -- There might be other cases as well, perhaps in some mod.
+        -- So check here that the entity we're trying to remove is still valid.
+        if to_remove.valid then
+            remove_success = to_remove.mine {
+                inventory =
+                    player.character
+                    and player.character.get_main_inventory(),
+                raise_destroyed = true,
+            }
+            if not remove_success then
+                return
+            end
         end
     end
 

@@ -77,3 +77,19 @@ Date: 2021-01-14
     - Fixed crash when removing multiple obstacles
     - Fixed bug where obstacles at the far end of a curved rail would not be removed
     - Increased search radius slightly
+
+
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2025-11-29
+
+  Changes:
+    - Updated for Factorio 2.0
+
+
+---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2025-12-11
+
+  Changes:
+    - Fix for removing cliffs (and potentially other things that change entities while being removed)
