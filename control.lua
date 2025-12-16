@@ -246,7 +246,11 @@ local function on_player_changed_position(event)
     -- }
 
     for _, to_place in pairs(stuff_to_place) do
-        try_revive_entity(to_place, player)
+        -- It's possible that while placing stuff other entities become invalid, this seems to happen when placing rail supports.
+        -- I'm not 100% sure why, but was able to consistently reproduce by standing on a rail support ghost with a bunch of other random rail and rail support ghosts around me. I think it might be because the entity itself gets changed when another rail support is placed or something like that.
+        if to_place.valid then
+            try_revive_entity(to_place, player)
+        end
     end
 end
 
